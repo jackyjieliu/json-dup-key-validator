@@ -15,7 +15,7 @@ jsonValidator.validate(jsonString, allowDuplicatedKeys);
 jsonValidator.parse(jsonString, allowDuplicatedKeys);
 ```
 ## API
-### .validate(jsonString, allowDuplicatedKeys)
+## .validate(jsonString, allowDuplicatedKeys)
 Validates a json string and returns error if any, undefined if the json string is valid.
 #### jsonString
 Type: `String`
@@ -28,7 +28,7 @@ Default: `false`
 
 Whether duplicated keys are allowed in an object or not
 
-### .parse(jsonString, allowDuplicatedKeys)
+## .parse(jsonString, allowDuplicatedKeys)
 Parses a json string and returns the parsed result. Throws error if the json string is not valid.
 #### jsonString
 Type: `String`
