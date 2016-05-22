@@ -1,5 +1,5 @@
 {
-  "name": "json-validator",
+  "name": "json-dup-key-validator",
   "version": "1.0.0",
   "description": "",
   "keywords": [
@@ -14,14 +14,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/jackyjieliu/json-validator.git"
+    "url": "https://github.com/jackyjieliu/json-dup-key-validator.git"
   },
   "author": "Jie Liu (Jacky)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/jackyjieliu/json-validator/issues"
+    "url": "https://github.com/jackyjieliu/json-dup-key-validator/issues"
   },
-  "homepage": "https://github.com/jackyjieliu/json-validator",
+  "homepage": "https://github.com/jackyjieliu/json-dup-key-validator",
   "dependencies": {
     "backslash": "^0.2.0"
   },
