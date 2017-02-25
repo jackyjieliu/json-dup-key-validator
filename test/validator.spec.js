@@ -4,6 +4,24 @@ var expect = require('chai').expect;
 var validator = require('../');
 
 describe('test', function() {
+  it('should validate empty object', function() {
+    var emptyArr = '[]';
+    var emptyObj = '{}';
+    var emptyStr = '""';
+
+    expect(validator.parse(emptyArr, false)).to.deep.equal([]);
+    expect(validator.parse(emptyArr, true)).to.deep.equal([]);
+
+    expect(validator.parse(emptyObj, false)).to.deep.equal({});
+    expect(validator.parse(emptyObj, true)).to.deep.equal({});
+
+    expect(validator.parse(emptyStr, false)).to.deep.equal("");
+    expect(validator.parse(emptyStr, true)).to.deep.equal("");
+
+    expect(validator.validate(emptyArr, false)).to.equal(undefined);
+    expect(validator.validate(emptyObj, false)).to.equal(undefined);
+    expect(validator.validate(emptyStr, false)).to.equal(undefined);
+  });
   it('valid json', function() {
     var validJson = [{
       path: './test/fixture/valid-array.json',
@@ -16,7 +34,7 @@ describe('test', function() {
         23.455,
         {
           "k": "v"
-        }
+        }, {}
       ]
     }, {
       path: './test/fixture/valid-object.json',
@@ -33,7 +51,9 @@ describe('test', function() {
             null,
             true,
             false
-          ]
+          ],
+          "nestedEmptyArr": [],
+          "nestedEmptyObj": {}
         }
       }
     }, {
