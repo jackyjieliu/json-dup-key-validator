@@ -268,6 +268,20 @@ function _findObject(str, startInd, allowDuplicatedKeys) {
   var i = startInd;
   var sepValue = ',';
   var obj = {};
+
+  var j = startInd;
+  while (_isWhiteSpace(str[j])) {
+    j++;
+  }
+
+  if (str[j] === '}') {
+    return {
+      start: startInd,
+      end: j,
+      value: obj
+    };
+  }
+
   while (sepValue === ',') {
     var key = _findKey(str, i);
     var semi = _findSemiColonSeparator(str, key.end);
@@ -319,6 +333,20 @@ function _findArray(str, startInd) {
   var i = startInd;
   var sepValue = ',';
   var arr = [];
+
+  var j = startInd;
+  while (_isWhiteSpace(str[j])) {
+    j++;
+  }
+
+  if (str[j] === ']') {
+    return {
+      start: startInd,
+      end: j,
+      value: arr
+    };
+  }
+
   while (sepValue === ',') {
     var value = _findValue(str, i);
     var sepIndex = _findSeparator(str, value.end);
