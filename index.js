@@ -13,12 +13,13 @@ module.exports = {
  */
 function validate(jsonString, allowDuplicatedKeys) {
   var error;
+  allowDuplicatedKeys = allowDuplicatedKeys || false;
   if (typeof jsonString !== 'string') {
     error = 'Input must be a string';
   } else {
     try {
       // Try to find a value starting from index 0
-      _findValue(jsonString, 0, allowDuplicatedKeys);
+      _findValue(jsonString, 0, allowDuplicatedKeys, false);
     } catch(e) {
       error = e.message;
     }
@@ -36,8 +37,11 @@ function parse(jsonString, allowDuplicatedKeys) {
   if (typeof jsonString !== 'string') {
     throw new Error('Input must be a string');
   }
+
+  allowDuplicatedKeys = allowDuplicatedKeys || false;
+
   // Try to find a value starting from index 0
-  var value = _findValue(jsonString, 0, allowDuplicatedKeys);
+  var value = _findValue(jsonString, 0, allowDuplicatedKeys, true);
   return value.value;
 }
 
@@ -118,7 +122,7 @@ function _findSemiColonSeparator(str, startInd) {
  * @returns {{value: *, start: Number, end: Number}}
  * @private
  */
-function _findValue(str, startInd, allowDuplicatedKeys) {
+function _findValue(str, startInd, allowDuplicatedKeys, parse) {
   var len = str.length;
   var valueStartInd;
   var valueEndInd;
@@ -127,6 +131,7 @@ function _findValue(str, startInd, allowDuplicatedKeys) {
   var isString = false;
   var isNumber = false;
   var dotFound = false;
+  var whiteSpaceInNumber = false;
   var value;
 
   for (var i = startInd; i < len; i++) {
@@ -160,6 +165,8 @@ function _findValue(str, startInd, allowDuplicatedKeys) {
           break;
         } else if (_isNumber(ch)) {
           isNumber = true;
+        } else if (ch === '-') {
+          isNumber = true;
         } else {
           throw _syntaxError(str, i, '');
         }
@@ -167,12 +174,12 @@ function _findValue(str, startInd, allowDuplicatedKeys) {
       }
     } else {
       if (isArray) {
-        var arr = _findArray(str, i);
+        var arr = _findArray(str, i, allowDuplicatedKeys, parse);
         valueEndInd = arr.end;
         value = arr.value;
         break;
       } else if (isObject) {
-        var obj = _findObject(str, i, allowDuplicatedKeys);
+        var obj = _findObject(str, i, allowDuplicatedKeys, parse);
         valueEndInd = obj.end;
         value = obj.value;
         break;
@@ -181,14 +188,16 @@ function _findValue(str, startInd, allowDuplicatedKeys) {
         value = backslash(str.substring(valueStartInd + 1, valueEndInd));
         break;
       } else if (isNumber) {
-        if (_isNumber(ch)) {
-          continue;
-        } else if (ch === '.' && !dotFound) {
-          dotFound = true;
-        } else if (_isWhiteSpace(ch) || ch === ',' || ch === ']' || ch === '}') {
+        if(_isWhiteSpace(ch)) {
+          whiteSpaceInNumber = true;
+        } else if (ch === ',' || ch === ']' || ch === '}') {
           value = parseFloat(str.substring(valueStartInd, valueEndInd), 10);
           valueEndInd = i - 1;
           break;
+        } else if (_isNumber(ch) && !whiteSpaceInNumber) {
+          continue;
+        } else if (ch === '.' && !dotFound && !whiteSpaceInNumber) {
+          dotFound = true;
         } else {
           throw _syntaxError(str, i, 'expecting number');
         }
@@ -264,10 +273,12 @@ function _findKey(str, startInd) {
  * @returns {{start: Number, end: Number, value: Object}}
  * @private
  */
-function _findObject(str, startInd, allowDuplicatedKeys) {
+function _findObject(str, startInd, allowDuplicatedKeys, parse) {
   var i = startInd;
   var sepValue = ',';
   var obj = {};
+  var keys = [];
+  var values = [];
 
   var j = startInd;
   while (_isWhiteSpace(str[j])) {
@@ -285,18 +296,27 @@ function _findObject(str, startInd, allowDuplicatedKeys) {
   while (sepValue === ',') {
     var key = _findKey(str, i);
     var semi = _findSemiColonSeparator(str, key.end);
-    var value = _findValue(str, semi.end);
+    var value = _findValue(str, semi.end, allowDuplicatedKeys, parse);
     var sepIndex = _findSeparator(str, value.end);
 
     if (!allowDuplicatedKeys) {
-      if(obj[key.value] !== undefined) {
+      if(keys.indexOf(key.value) !== -1) {
         throw _syntaxError(str, key.end, 'duplicated keys "' + key.value + '"');
       }
     }
-    obj[key.value] = value.value;
+    keys.push(key.value);
+    values.push(value.value);
     i = sepIndex.end;
     sepValue = sepIndex.value;
   }
+
+  if (parse) {
+    var indx = 0;
+    for(indx = 0; indx < keys.length; indx++) {
+      obj[keys[indx]] = values[indx];
+    }
+  }
+
   return {
     start: startInd,
     end: i,
@@ -329,7 +349,7 @@ function _hasEvenNumberOfBackSlash(str, endInd) {
  * @returns {{start: Number, end: Number, value: Array}}
  * @private
  */
-function _findArray(str, startInd) {
+function _findArray(str, startInd, allowDuplicatedKeys, parse) {
   var i = startInd;
   var sepValue = ',';
   var arr = [];
@@ -348,9 +368,12 @@ function _findArray(str, startInd) {
   }
 
   while (sepValue === ',') {
-    var value = _findValue(str, i);
+    var value = _findValue(str, i, allowDuplicatedKeys, parse);
     var sepIndex = _findSeparator(str, value.end);
-    arr.push(value.value);
+
+    if (parse) {
+      arr.push(value.value);
+    }
     i = sepIndex.end;
     sepValue = sepIndex.value;
   }

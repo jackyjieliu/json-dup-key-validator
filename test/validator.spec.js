@@ -31,7 +31,9 @@ describe('test', function() {
         null,
         "a string",
         123,
+        -123,
         23.455,
+        -23.455,
         {
           "k": "v"
         }, {}
@@ -62,6 +64,11 @@ describe('test', function() {
     }, {
       path: './test/fixture/valid-number.json',
       expectedValue: 123.456
+    }, {
+      path: './test/fixture/valid-to-string.json',
+      expectedValue: {
+        toString: 'asd'
+      }
     }];
 
     for (var i = 0; i < validJson.length; i++) {
@@ -79,6 +86,12 @@ describe('test', function() {
     }, {
       path: './test/fixture/invalid-object.json',
       expectedError: 'Syntax error: expecting \':\' near d"": 123\n}'
+    }, {
+      path: './test/fixture/invalid-number-space.json',
+      expectedError: 'Syntax error: expecting number near 3.112 24\n]'
+    }, {
+      path: './test/fixture/invalid-number-negative-negative.json',
+      expectedError: 'Syntax error: expecting number near 3.112-24\n]'
     }];
 
     for (var i = 0; i < invalidJson.length; i++) {
