@@ -65,6 +65,12 @@ describe('test', function() {
       path: './test/fixture/valid-number.json',
       expectedValue: 123.456
     }, {
+      path: './test/fixture/valid-scientific-number.json',
+      expectedValue: 1.23e+45
+    }, {
+      path: './test/fixture/valid-signed-scientific-number.json',
+      expectedValue: 1.23e+45
+    }, {
       path: './test/fixture/valid-to-string.json',
       expectedValue: {
         toString: 'asd'
@@ -92,6 +98,15 @@ describe('test', function() {
     }, {
       path: './test/fixture/invalid-number-negative-negative.json',
       expectedError: 'Syntax error: expecting number near 3.112-24\n]'
+    }, {
+      path: './test/fixture/invalid-scientific-number-decimal-after-e.json',
+      expectedError: 'Syntax error: expecting number near 123e4.56'
+    }, {
+      path: './test/fixture/invalid-scientific-number-missing-exponent-digits.json',
+      expectedError: 'Syntax error: expecting number near 123e'
+    }, {
+      path: './test/fixture/invalid-signed-scientific-number.json',
+      expectedError: 'Syntax error: expecting number near 123e4+56'
     }];
 
     for (var i = 0; i < invalidJson.length; i++) {
