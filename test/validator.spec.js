@@ -99,6 +99,9 @@ describe('test', function() {
       path: './test/fixture/invalid-number-negative-negative.json',
       expectedError: 'Syntax error: expecting number near 3.112-24\n]'
     }, {
+      path: './test/fixture/invalid-scientific-number-two-e.json',
+      expectedError: 'Syntax error: expecting number near 123e3E5'
+    }, {
       path: './test/fixture/invalid-scientific-number-decimal-after-e.json',
       expectedError: 'Syntax error: expecting number near 123e4.56'
     }, {
