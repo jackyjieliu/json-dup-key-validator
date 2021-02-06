@@ -42,6 +42,7 @@ describe('test', function() {
       path: './test/fixture/valid-object.json',
       expectedValue: {
         "a": "a string value",
+        "scientificNumber": 12300,
         "with back quote\"": [
           123,
           234,
