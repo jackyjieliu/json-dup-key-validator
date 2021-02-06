@@ -131,6 +131,8 @@ function _findValue(str, startInd, allowDuplicatedKeys, parse) {
   var isString = false;
   var isNumber = false;
   var dotFound = false;
+  var exponentInd;
+  var exponentPostNumberCount = 0;
   var whiteSpaceInNumber = false;
   var value;
 
@@ -195,14 +197,25 @@ function _findValue(str, startInd, allowDuplicatedKeys, parse) {
           valueEndInd = i - 1;
           break;
         } else if (_isNumber(ch) && !whiteSpaceInNumber) {
+          if (exponentInd) {
+            exponentPostNumberCount++;
+          }
           continue;
-        } else if (ch === '.' && !dotFound && !whiteSpaceInNumber) {
+        } else if (ch === '.' && !dotFound && !exponentInd && !whiteSpaceInNumber) {
           dotFound = true;
+        } else if ((ch === 'e' || ch === 'E') && !exponentInd && !whiteSpaceInNumber) {
+          exponentInd = i;
+        } else if ((ch === '+' || ch === '-') && exponentInd === i - 1 && !whiteSpaceInNumber) {
+          continue;
         } else {
           throw _syntaxError(str, i, 'expecting number');
         }
       }
     }
+  }
+
+  if (isNumber && exponentInd && !exponentPostNumberCount) {
+    throw _syntaxError(str, i, 'expecting number');
   }
 
   if (valueEndInd === undefined) {
